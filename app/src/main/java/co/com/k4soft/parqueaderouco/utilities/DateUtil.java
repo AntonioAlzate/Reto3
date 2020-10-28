@@ -27,7 +27,7 @@ public class DateUtil {
 
 
     public static String convertDateToStringNotHour(Date date){
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA,Locale.ENGLISH);
         return dateFormat.format(date);
     }
 
@@ -54,11 +54,60 @@ public class DateUtil {
             minutos = (int) Math.floor(diferencia / 60);
             diferencia = diferencia - (minutos * 60);
         }
-        String tiempoCalculado =  dias + " dias, " + horas + " horas, " + minutos + " minutos y " + diferencia + " segundos";
+        String tiempoCalculado = "";
+
+        if(dias > 0)
+            tiempoCalculado += dias + "dias, ";
+
+        if(horas > 0)
+            tiempoCalculado += horas + "horas, ";
+
+        tiempoCalculado += minutos + " minutos y " + diferencia + " segundos";
         return tiempoCalculado;
 
     }
 
+    public static int timeFromDatesDias(String fechaInicialString, String fechaFinalString) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA, Locale.ENGLISH);
+        Date fechaInicial = dateFormat.parse(fechaInicialString);
+        Date fechaFinal = dateFormat.parse(fechaFinalString);
+
+        int diferencia = (int) ((fechaFinal.getTime() - fechaInicial.getTime()) / 1000);
+
+        int dias = 0;
+        if (diferencia > 86400) {
+            dias = (int) Math.floor(diferencia / 86400);
+        }
+        return dias;
+    }
+
+    public static int timeFromDatesHoras(String fechaInicialString, String fechaFinalString) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA, Locale.ENGLISH);
+        Date fechaInicial = dateFormat.parse(fechaInicialString);
+        Date fechaFinal = dateFormat.parse(fechaFinalString);
+
+        int diferencia = (int) ((fechaFinal.getTime() - fechaInicial.getTime()) / 1000);
+
+        int horas = 0;
+        if (diferencia > 3600) {
+            horas = (int) Math.floor(diferencia / 3600);
+        }
+        return horas;
+    }
+
+    public static int timeFromDatesMinutos(String fechaInicialString, String fechaFinalString) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA, Locale.ENGLISH);
+        Date fechaInicial = dateFormat.parse(fechaInicialString);
+        Date fechaFinal = dateFormat.parse(fechaFinalString);
+
+        int diferencia = (int) ((fechaFinal.getTime() - fechaInicial.getTime()) / 1000);
+
+        int minutos = 0;
+        if (diferencia > 60) {
+            minutos = (int) Math.floor(diferencia / 60);
+        }
+        return minutos;
+    }
 
     public  static String getCurrenDate(){
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA,Locale.ENGLISH);

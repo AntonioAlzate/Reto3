@@ -32,6 +32,9 @@ public class Movimiento {
     @ColumnInfo(name = "fechaSalida")
     private String fechaSalida;
 
+    @ColumnInfo(name = "pago")
+    private double pago;
+
     @ColumnInfo(name = "finalizaMovimiento")
     private boolean finalizaMovimiento;
 

@@ -7,6 +7,7 @@ import androidx.room.Query;
 
 import java.util.List;
 
+import co.com.k4soft.parqueaderouco.entidades.Movimiento;
 import co.com.k4soft.parqueaderouco.entidades.Tarifa;
 
 @Dao
@@ -23,6 +24,10 @@ public interface TarifaDAO {
 
     @Query("SELECT * FROM tarifa")
     List<Tarifa> listar();
+
+    @Query("SELECT * FROM tarifa Where idTarifa=:idTarifa")
+    Tarifa findById(Integer idTarifa);
+
 
 
 

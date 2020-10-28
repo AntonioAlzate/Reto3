@@ -21,4 +21,10 @@
     <string name="buscar">Buscar</string>
     <string name="debe_seleccionar_tarifa">Debe seleccionar una tarifa</string>
     <string name="informacion_guardada_exitosamente">La información se ha guardado exitosamente</string>
+    <string name="placa_no_valida">La placa no es valida ingresar de nuevo</string>
+    <string name="salida_registrada_exitosamente">La Salida del vehiculo se registro exitosamente.</string>
+    <string name="opcion_reporte">Reporte Parqueadero</string>
+    <string name="titulo_reporte_parqueadero">Reporte Parqueadero</string>
+    <string name="total_recaudado">Total Recaudado:</string>
+    <string name="formato_lista_movimientos">"PLACA    |  FECHA INGRESO         |  FECHA SALIDA  "</string>
 </resources>

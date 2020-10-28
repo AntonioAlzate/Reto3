@@ -45,4 +45,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MovimientoActivity.class);
         startActivity(intent);
     }
+
+    public void goToReporteActivity(View view){
+        Intent intent = new Intent(this, ReporteActivity.class);
+        startActivity(intent);
+    }
 }
