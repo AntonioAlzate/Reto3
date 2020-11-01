@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,8 +60,10 @@ public class ReporteActivity extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
                 String fecha = year + "-" + (month + 1) + "-" + dayOfMonth;
-                Date fechaMod = DateUtil.convertStringToDateNotHour(fecha);
-                txtFechaInicial.setText(DateUtil.convertDateToString(fechaMod));
+                Date fechaEnDate = DateUtil.convertStringToDateNotHour(fecha);
+                txtFechaInicial.setText(DateUtil.convertDateToString(fechaEnDate));
+
+                limpiarListViewAndTotalRecaudado();
             }
         }, yearActual, mesActual, diaActual);
         datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTime().getTime());
@@ -81,12 +84,20 @@ public class ReporteActivity extends AppCompatActivity {
                 }
                 String hora = horasFinales + ":" + minutosFinales + ":" + segundosFinales;
                 String fecha = year + "-" + (month + 1) + "-" + dayOfMonth + " " + hora;
-                Date fechaMod = DateUtil.convertStringToDate(fecha);
-                txtFechaSalida.setText(DateUtil.convertDateToString(fechaMod));
+                Date fechaEnDate = DateUtil.convertStringToDate(fecha);
+                txtFechaSalida.setText(DateUtil.convertDateToString(fechaEnDate));
+
+                limpiarListViewAndTotalRecaudado();
             }
         }, yearActual, mesActual, diaActual);
         datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTime().getTime());
         datePickerDialog.show();
+    }
+
+    private void limpiarListViewAndTotalRecaudado(){
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item,new ArrayList<String>());
+        lstListaVehiculos.setAdapter(arrayAdapter);
+        txtTotalRecaudado.setText(getText(R.string.sin_configurar));
     }
 
     public void cargarMovimientos(View view) throws ParseException{
@@ -99,7 +110,6 @@ public class ReporteActivity extends AppCompatActivity {
             int diferenciaDias = DateUtil.timeFromDatesDias(fechaInicial, fechaSalida);
             if(diferenciaDias < 0) {
                 Toast.makeText(getApplicationContext(), R.string.fecha_salida_no_valida, Toast.LENGTH_LONG).show();
-                txtFechaSalida.setError(getText(R.string.fecha_salida_no_valida));
             }else{
                 List<Movimiento> listaMovimientosEnRango = db.getMovimientoDAO().listarMovimientosFinalizadosRango(fechaInicial, fechaSalida);
                 mostrarTotalRecaudado(listaMovimientosEnRango);
