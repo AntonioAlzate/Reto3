@@ -2,13 +2,18 @@ package co.com.k4soft.parqueaderouco.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.amitshekhar.utils.DatabaseHelper;
-
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -16,6 +21,7 @@ import butterknife.ButterKnife;
 import co.com.k4soft.parqueaderouco.R;
 import co.com.k4soft.parqueaderouco.entidades.Movimiento;
 import co.com.k4soft.parqueaderouco.persistencia.room.DataBaseHelper;
+import co.com.k4soft.parqueaderouco.utilities.DateUtil;
 
 public class ReporteActivity extends AppCompatActivity {
 
@@ -23,7 +29,18 @@ public class ReporteActivity extends AppCompatActivity {
     public TextView txtTotalRecaudado;
     @BindView(R.id.lstListaVehiculos)
     public ListView lstListaVehiculos;
+    @BindView(R.id.txtFechaInicial)
+    public TextView txtFechaInicial;
+    @BindView(R.id.txtFechaSalida)
+    public TextView txtFechaSalida;
+
     private DataBaseHelper db;
+
+    //private DatePickerDialog datePickerDialog;
+
+    int diaActual = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+    int mesActual = Calendar.getInstance().get(Calendar.MONTH);
+    int yearActual = Calendar.getInstance().get(Calendar.YEAR);
 
     private List<String> listaMovimientos;
     private ArrayAdapter<String> arrayAdapter;
@@ -35,31 +52,81 @@ public class ReporteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reporte);
         db = DataBaseHelper.getDBMainThread(this);
         ButterKnife.bind(this);
-        mostrarTotalRecaudado();
-        cargarMovimientos();
     }
 
-    private void cargarMovimientos(){
-        List<Movimiento> listaMovimientosFinalizados = db.getMovimientoDAO().listarMovimientosFinalizados();
+    public void configurarFechaInicialDatePickerDialog(View view) {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                String fecha = year + "-" + (month + 1) + "-" + dayOfMonth;
+                Date fechaMod = DateUtil.convertStringToDateNotHour(fecha);
+                txtFechaInicial.setText(DateUtil.convertDateToString(fechaMod));
+            }
+        }, yearActual, mesActual, diaActual);
+        datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTime().getTime());
+        datePickerDialog.show();
+    }
 
-        String[] movimientosArray = new String[listaMovimientosFinalizados.size()];
-        for (int i = 0; i < listaMovimientosFinalizados.size(); i++) {
-            String placaFechas = String.format("  " + listaMovimientosFinalizados.get(i).getPlaca().toUpperCase() + "  |  " +
-                    listaMovimientosFinalizados.get(i).getFechaEntrada() + "  |  " + listaMovimientosFinalizados.get(i).getFechaSalida());
-            movimientosArray[i] = placaFechas;
+    public void configurarFechaFinalDatePickerDialog(View view) throws ParseException {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            int horasFinales = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+            int minutosFinales = Calendar.getInstance().get(Calendar.MINUTE);
+            int segundosFinales = Calendar.getInstance().get(Calendar.SECOND);
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                if(diaActual != dayOfMonth){
+                    horasFinales = 23;
+                    minutosFinales = 59;
+                    segundosFinales = 59;
+                }
+                String hora = horasFinales + ":" + minutosFinales + ":" + segundosFinales;
+                String fecha = year + "-" + (month + 1) + "-" + dayOfMonth + " " + hora;
+                Date fechaMod = DateUtil.convertStringToDate(fecha);
+                txtFechaSalida.setText(DateUtil.convertDateToString(fechaMod));
+            }
+        }, yearActual, mesActual, diaActual);
+        datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTime().getTime());
+        datePickerDialog.show();
+    }
+
+    public void cargarMovimientos(View view) throws ParseException{
+
+        if("".equals(txtFechaInicial.getText().toString()) || "".equals(txtFechaSalida.getText().toString())){
+            Toast.makeText(getApplicationContext(), R.string.fechas_no_diligenciadas, Toast.LENGTH_LONG).show();
+        }else{
+            String fechaInicial = txtFechaInicial.getText().toString();
+            String fechaSalida = txtFechaSalida.getText().toString();
+            int diferenciaDias = DateUtil.timeFromDatesDias(fechaInicial, fechaSalida);
+            if(diferenciaDias < 0) {
+                Toast.makeText(getApplicationContext(), R.string.fecha_salida_no_valida, Toast.LENGTH_LONG).show();
+                txtFechaSalida.setError(getText(R.string.fecha_salida_no_valida));
+            }else{
+                List<Movimiento> listaMovimientosEnRango = db.getMovimientoDAO().listarMovimientosFinalizadosRango(fechaInicial, fechaSalida);
+                mostrarTotalRecaudado(listaMovimientosEnRango);
+
+                String[] movimientosArray = new String[listaMovimientosEnRango.size()];
+
+                for (int i = 0; i < listaMovimientosEnRango.size(); i++) {
+                    String placaFechas = String.format("  " + listaMovimientosEnRango.get(i).getPlaca().toUpperCase() + "  |  " +
+                    listaMovimientosEnRango.get(i).getFechaEntrada() + "  |  " + listaMovimientosEnRango.get(i).getFechaSalida());
+                    movimientosArray[i] = placaFechas;
+                }
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, movimientosArray);
+                lstListaVehiculos.setAdapter(arrayAdapter);
+
+                Toast.makeText(getApplicationContext(), R.string.reporte_generado_exitosamente, Toast.LENGTH_LONG).show();
+            }
         }
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, movimientosArray);
-        lstListaVehiculos.setAdapter(arrayAdapter);
     }
 
-    private void mostrarTotalRecaudado(){
-        List<Movimiento> listaMovimientosFinalizados = db.getMovimientoDAO().listarMovimientosFinalizados();
+    private void mostrarTotalRecaudado(List<Movimiento> movimientos){
         double total = 0;
 
-        if(listaMovimientosFinalizados.isEmpty()){
+        if(movimientos.isEmpty()){
             txtTotalRecaudado.setText("0.0");
         }else {
-            for(Movimiento movimiento : listaMovimientosFinalizados){
+            for(Movimiento movimiento : movimientos){
                 total += movimiento.getPago();
             }
             txtTotalRecaudado.setText(String.format("%.2f", total));

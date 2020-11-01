@@ -25,12 +25,26 @@ public class DateUtil {
         return date;
     }
 
+    public static Date convertStringToDateNotHour(String stringDate) {
+        Date date = null;
+        try {
+            DateFormat format = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
+            date = format.parse(stringDate);
+        } catch (Exception e) {
+            Log.e("error", e.toString());
+        }
+        return date;
+    }
 
     public static String convertDateToStringNotHour(Date date){
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA,Locale.ENGLISH);
         return dateFormat.format(date);
     }
 
+    public static String convertDateToString(Date date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA,Locale.ENGLISH);
+        return dateFormat.format(date);
+    }
 
     public static String timeFromDates(String fechaInicialString, String fechaFinalString) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA, Locale.ENGLISH);
@@ -71,6 +85,9 @@ public class DateUtil {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_HORA, Locale.ENGLISH);
         Date fechaInicial = dateFormat.parse(fechaInicialString);
         Date fechaFinal = dateFormat.parse(fechaFinalString);
+
+        if(fechaInicial.getTime() > fechaFinal.getTime())
+            return -1;
 
         int diferencia = (int) ((fechaFinal.getTime() - fechaInicial.getTime()) / 1000);
 

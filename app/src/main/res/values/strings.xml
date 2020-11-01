@@ -27,4 +27,11 @@
     <string name="titulo_reporte_parqueadero">Reporte Parqueadero</string>
     <string name="total_recaudado">Total Recaudado:</string>
     <string name="formato_lista_movimientos">"PLACA    |  FECHA INGRESO         |  FECHA SALIDA  "</string>
+    <string name="fecha_inicial">Fecha Inicial</string>
+    <string name="fecha_final">Fecha Salida</string>
+    <string name="fecha_salida_no_valida">La fecha de salida es menor a la fecha inicial</string>
+    <string name="fechas_no_diligenciadas">Recuerde seleccionar fecha ingreso y fecha de salida</string>
+    <string name="generar_reporte">Generar Reporte</string>
+    <string name="sin_configurar">---.---</string>
+    <string name="reporte_generado_exitosamente">El reporte se genero exitosamente</string>
 </resources>

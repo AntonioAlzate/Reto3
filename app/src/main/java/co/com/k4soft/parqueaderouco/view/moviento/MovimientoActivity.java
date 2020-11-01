@@ -187,7 +187,7 @@ public class MovimientoActivity extends AppCompatActivity {
     }
 
     public void registrarSalida(View view) {
-        Movimiento movimiento = db.getMovimientoDAO().findByPLaca(txtPlaca.getText().toString());
+        Movimiento movimiento = db.getMovimientoDAO().findByPLaca(txtPlaca.getText().toString().toUpperCase());
 
         if(movimiento == null){
             Toast.makeText(getApplicationContext(),R.string.placa_no_valida, Toast.LENGTH_SHORT).show();

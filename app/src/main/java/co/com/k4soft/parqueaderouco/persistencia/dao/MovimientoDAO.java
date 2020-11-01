@@ -19,8 +19,8 @@ public interface MovimientoDAO {
     @Query("SELECT * FROM movimiento")
     List<Movimiento> listar();
 
-    @Query("SELECT * FROM movimiento where finalizaMovimiento = 1 ORDER BY fechaSalida")
-    List<Movimiento> listarMovimientosFinalizados();
+    @Query("SELECT * FROM movimiento where (finalizaMovimiento = 1 AND fechaEntrada >= :fechaInicio AND fechaSalida <= :fechaSalida) ORDER BY fechaSalida")
+    List<Movimiento> listarMovimientosFinalizadosRango(String fechaInicio, String fechaSalida);
 
     @Update
     void update(Movimiento movimiento);
